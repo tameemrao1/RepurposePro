@@ -4,8 +4,9 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Home } from "lucide-react"
+import { Suspense } from "react"
 
-export default function NotFound() {
+function NotFoundContent() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-4 text-center">
       <motion.div
@@ -25,5 +26,13 @@ export default function NotFound() {
         </Button>
       </motion.div>
     </div>
+  )
+}
+
+export default function NotFound() {
+  return (
+    <Suspense fallback={null}>
+      <NotFoundContent />
+    </Suspense>
   )
 }
