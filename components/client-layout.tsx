@@ -23,8 +23,8 @@ export function ClientLayout({ children }: ClientLayoutProps) {
   }
 
   return (
-    <div className="flex min-h-screen w-full">
-      <div className="bg-red">
+    <divx min-h-screen w-full">
+      <div>
         <AppSidebar />
       </div>
       <main className="flex-1 flex flex-col min-h-screen w-full">

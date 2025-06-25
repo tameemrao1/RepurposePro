@@ -25,9 +25,21 @@ export const useLoading = () => useContext(LoadingContext);
 export function LoadingProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("Loading...");
+  const [isMounted, setIsMounted] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  // Ensure component is mounted before rendering animations
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Ensure component is mounted before rendering animations
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Debounce loading state changes to prevent flashing
   const debouncedSetLoading = useCallback((value: boolean) => {
@@ -144,9 +156,13 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <LoadingContext.Provider value={{ isLoading, setIsLoading: debouncedSetLoading, loadingMessage, setLoadingMessage }}>
-      <AnimatePresence mode="wait">
-        {isLoading && <Preloader message={loadingMessage} />}
-      </AnimatePresence>
+      {isMounted && (
+        {isMounted && (
+          <AnimatePresence mode="wait">
+            {isLoading && <Preloader message={loadingMessage} />}
+        </AnimatePresence>
+      )}
+      )}
       {children}
     </LoadingContext.Provider>
   );

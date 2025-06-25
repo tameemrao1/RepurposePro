@@ -17,7 +17,9 @@ function NotFoundContent() {
       >
         <h1 className="text-6xl font-bold text-primary mb-4">404</h1>
         <h2 className="text-2xl font-semibold mb-4">Page Not Found</h2>
-        <p className="text-muted-foreground mb-8">The page you are looking for doesn't exist or has been moved.</p>
+        <p className="text-muted-foreground mb-8">
+          The page you are looking for doesn't exist or has been moved.
+        </p>
         <Button asChild size="lg">
           <Link href="/" className="flex items-center gap-2">
             <Home className="h-4 w-4" />
@@ -31,7 +33,7 @@ function NotFoundContent() {
 
 export default function NotFound() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<div>Loading...</div>}>
       <NotFoundContent />
     </Suspense>
   )

@@ -309,19 +309,19 @@ export default function GeneratedContent({ content, platforms, onRegenerateItem 
 
                           {/* AI-Powered Viral and SEO scores */}
                           {(typeof item.viralScore === 'number' || typeof item.seoScore === 'number') && (
-                            <div className="mt-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-md border border-blue-200">
+                            <div className="mt-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/50 dark:to-purple-950/50 rounded-md border border-blue-200 dark:border-blue-800">
                               <div className="flex items-center gap-2 mb-2">
-                                <Sparkles className="h-4 w-4 text-blue-600" />
-                                <span className="text-xs font-semibold text-blue-700">AI Insights</span>
+                                <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                <span className="text-xs font-semibold text-blue-700 dark:text-blue-300">AI Insights</span>
                               </div>
                               <div className="flex flex-wrap gap-3">
                               {typeof item.viralScore === 'number' && (
                                 <div className="flex items-center gap-2">
                                   <span className="text-xs font-medium text-muted-foreground">🔥 Viral:</span>
                                   <span className={`text-sm font-bold px-2 py-1 rounded-md ${
-                                    item.viralScore >= 80 ? 'text-green-600 bg-green-50' :
-                                    item.viralScore >= 60 ? 'text-yellow-600 bg-yellow-50' :
-                                    'text-red-600 bg-red-50'
+                                    item.viralScore >= 80 ? 'text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-950/50' :
+                                    item.viralScore >= 60 ? 'text-yellow-600 bg-yellow-50 dark:text-yellow-400 dark:bg-yellow-950/50' :
+                                    'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-950/50'
                                   }`}>
                                     {item.viralScore}%
                                   </span>
@@ -331,9 +331,9 @@ export default function GeneratedContent({ content, platforms, onRegenerateItem 
                                 <div className="flex items-center gap-2">
                                   <span className="text-xs font-medium text-muted-foreground">📊 SEO:</span>
                                   <span className={`text-sm font-bold px-2 py-1 rounded-md ${
-                                    item.seoScore >= 80 ? 'text-green-600 bg-green-50' :
-                                    item.seoScore >= 60 ? 'text-yellow-600 bg-yellow-50' :
-                                    'text-red-600 bg-red-50'
+                                    item.seoScore >= 80 ? 'text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-950/50' :
+                                    item.seoScore >= 60 ? 'text-yellow-600 bg-yellow-50 dark:text-yellow-400 dark:bg-yellow-950/50' :
+                                    'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-950/50'
                                   }`}>
                                     {item.seoScore}%
                                   </span>

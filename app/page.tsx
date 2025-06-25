@@ -43,9 +43,13 @@ export default function Home() {
         </div>
 
         <div className="flex items-center gap-4">
-        <Link href="/login" className="bg-gradient-to-r from-[#7c3bed] to-[#9d5aff] hover:opacity-90 transition-all shadow-[0_0_15px_rgba(124,59,237,0.5)] hover:shadow-[0_0_25px_rgba(124,59,237,0.7)] text-base py-2 px-7">
+            <Link href="/login">
+            <Button>
+            <Button className="bg-gradient-to-r from-[#7c3bed] to-[#9d5aff] hover:opacity-90 transition-all shadow-[0_0_15px_rgba(124,59,237,0.5)] hover:shadow-[0_0_25px_rgba(124,59,237,0.7)] text-base py-2 px-7">
               Sign In
-            </Link>
+            </Button>
+          </Button>
+          </Link>
           <MobileMenuWrapper />
         </div>
       </div>
@@ -53,19 +57,8 @@ export default function Home() {
 
       {/* Rest of the content */}
       <div className="relative">
-      {/* 3D Hero Section */}
-      <HeroSection />
-
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] bg-[#7c3bed]/20 rounded-full blur-[120px] animate-pulse"></div>
-        <div
-          className="absolute top-[30%] -right-[20%] w-[60%] h-[60%] bg-[#a56eff]/20 rounded-full blur-[150px] animate-pulse"
-          style={{ animationDelay: "1s" }}
-        ></div>
-        <div
-          className="absolute -bottom-[10%] left-[20%] w-[50%] h-[50%] bg-[#7c3bed]/10 rounded-full blur-[100px] animate-pulse"
-          style={{ animationDelay: "2s" }}
-        ></div>
+          {/* 3D Hero Section */}
+          <HeroSection />
       </div>
 
 
