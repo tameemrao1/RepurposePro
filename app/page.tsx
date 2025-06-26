@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Star, Zap, Layers, BarChart3, Upload, Settings, Check } from "lucide-react";
@@ -43,12 +44,10 @@ export default function Home() {
         </div>
 
         <div className="flex items-center gap-4">
-            <Link href="/login">
-            <Button>
+          <Link href="/login">
             <Button className="bg-gradient-to-r from-[#7c3bed] to-[#9d5aff] hover:opacity-90 transition-all shadow-[0_0_15px_rgba(124,59,237,0.5)] hover:shadow-[0_0_25px_rgba(124,59,237,0.7)] text-base py-2 px-7">
               Sign In
             </Button>
-          </Button>
           </Link>
           <MobileMenuWrapper />
         </div>
@@ -623,7 +622,6 @@ export default function Home() {
           </div>
         </div>
       </footer>
-      </div>
     </div>
-  )
+  );
 }

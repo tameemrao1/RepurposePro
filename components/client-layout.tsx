@@ -23,7 +23,7 @@ export function ClientLayout({ children }: ClientLayoutProps) {
   }
 
   return (
-    <divx min-h-screen w-full">
+    <div className="min-h-screen w-full">
       <div>
         <AppSidebar />
       </div>

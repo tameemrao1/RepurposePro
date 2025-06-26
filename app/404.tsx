@@ -23,7 +23,7 @@ function NotFoundContent() {
         <Button asChild size="lg">
           <Link href="/" className="flex items-center gap-2">
             <Home className="h-4 w-4" />
-            Back to Dashboard
+            Back to Home
           </Link>
         </Button>
       </motion.div>

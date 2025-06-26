@@ -10,13 +10,13 @@ import { ArrowLeft, ArrowRight } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useToast } from "@/components/ui/use-toast"
 import { useLoading } from "@/components/loading-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { LandingHeader } from "@/components/landing-header"
 
-export default function LoginPage() {
+function LoginContent() {
   const [isLoading, setIsLoading] = useState(false)
   const { setIsLoading: setGlobalLoading, setLoadingMessage } = useLoading()
   const [formData, setFormData] = useState({
@@ -227,5 +227,13 @@ export default function LoginPage() {
       </main>
       <Toaster />
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-b from-black to-[#0a0014] text-white flex items-center justify-center">Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   )
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, Suspense } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
 import { Preloader } from './preloader';
@@ -22,19 +22,13 @@ const LoadingContext = createContext<LoadingContextType>({
 
 export const useLoading = () => useContext(LoadingContext);
 
-export function LoadingProvider({ children }: { children: React.ReactNode }) {
+function LoadingProviderContent({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("Loading...");
-  const [isMounted, setIsMounted] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
-
-  // Ensure component is mounted before rendering animations
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   // Ensure component is mounted before rendering animations
   useEffect(() => {
@@ -157,13 +151,19 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
   return (
     <LoadingContext.Provider value={{ isLoading, setIsLoading: debouncedSetLoading, loadingMessage, setLoadingMessage }}>
       {isMounted && (
-        {isMounted && (
-          <AnimatePresence mode="wait">
-            {isLoading && <Preloader message={loadingMessage} />}
+        <AnimatePresence mode="wait">
+          {isLoading && <Preloader message={loadingMessage} />}
         </AnimatePresence>
-      )}
       )}
       {children}
     </LoadingContext.Provider>
   );
-} 
+}
+
+export function LoadingProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoadingProviderContent>{children}</LoadingProviderContent>
+    </Suspense>
+  );
+}

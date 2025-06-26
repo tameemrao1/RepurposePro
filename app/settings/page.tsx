@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -24,7 +24,7 @@ interface NotificationSettings {
   productUpdates: boolean
 }
 
-export default function Settings() {
+function SettingsContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { theme, setTheme } = useTheme()
@@ -729,5 +729,13 @@ export default function Settings() {
         </motion.div>
       </div>
     </div>
+  )
+}
+
+export default function Settings() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+      <SettingsContent />
+    </Suspense>
   )
 }
