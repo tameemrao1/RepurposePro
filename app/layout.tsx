@@ -23,8 +23,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased relative min-h-screen w-full overflow-x-hidden`}>
+    <html lang="en" suppressHydrationWarning className="h-full">
+      <body className={`${inter.variable} font-sans antialiased h-full w-full overflow-hidden`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <LoadingProvider>
             <SidebarProvider defaultOpen={true}>

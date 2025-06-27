@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import type { RegenerateRequest } from "@/lib/types"
 
 // OpenRouter API key
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "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"
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "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"
 
 export async function POST(request: Request) {
   try {

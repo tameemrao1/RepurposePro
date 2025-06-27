@@ -49,11 +49,17 @@ function LoadingProviderContent({ children }: { children: React.ReactNode }) {
   // Update loading message based on the current route
   const updateLoadingMessage = useCallback((path: string) => {
     if (path.includes('/login')) {
-      setLoadingMessage("Logging in...");
+      setLoadingMessage("Signing you in...");
     } else if (path.includes('/signup')) {
       setLoadingMessage("Creating your account...");
     } else if (path.includes('/dashboard')) {
-      setLoadingMessage("Loading dashboard...");
+      setLoadingMessage("Preparing your dashboard...");
+    } else if (path.includes('/generator')) {
+      setLoadingMessage("Loading content generator...");
+    } else if (path.includes('/library')) {
+      setLoadingMessage("Loading your content library...");
+    } else if (path.includes('/settings')) {
+      setLoadingMessage("Loading settings...");
     } else {
       setLoadingMessage("Loading...");
     }
@@ -162,7 +168,7 @@ function LoadingProviderContent({ children }: { children: React.ReactNode }) {
 
 export function LoadingProvider({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Preloader message="Initializing..." variant="minimal" />}>
       <LoadingProviderContent>{children}</LoadingProviderContent>
     </Suspense>
   );

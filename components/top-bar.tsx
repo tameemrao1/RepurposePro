@@ -227,13 +227,12 @@ export function TopBar({ title }: TopBarProps) {
         <div className="md:hidden">
           <SidebarTrigger />
         </div>
-
+        <div className="block mx-3 md:hidden rounded-lg bg-primary p-1.5 shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-zap h-5 w-5 text-primary-foreground"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"></path></svg></div>
         {title && (
-          <div className="hidden md:block">
+          <div className="ml-2 hidden md:block">
             <h1 className="text-lg font-semibold">{title}</h1>
           </div>
         )}
-
         <div className="flex flex-1 items-center justify-end space-x-4">
           <div className="flex items-center space-x-4">
             <ModeToggle />

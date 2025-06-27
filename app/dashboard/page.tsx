@@ -28,18 +28,31 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Get the current session
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        // Get the current session with retry logic
+        let session = null
+        let sessionError = null
+        
+        // Try up to 3 times to get session (sometimes takes a moment after login)
+        for (let i = 0; i < 3; i++) {
+          const result = await supabase.auth.getSession()
+          session = result.data.session
+          sessionError = result.error
+          
+          if (session || sessionError) break
+          
+          // Wait 500ms before retrying
+          await new Promise(resolve => setTimeout(resolve, 500))
+        }
         
         if (sessionError) {
           console.error('Session error:', sessionError)
-          router.push('/login')
+          router.push('/login?redirectedFrom=%2Fdashboard')
           return
         }
 
         if (!session?.user) {
           console.log('No authenticated user')
-          router.push('/login')
+          router.push('/login?redirectedFrom=%2Fdashboard')
           return
         }
 
@@ -204,11 +217,27 @@ export default function Dashboard() {
     },
   ]
 
+  // Show loading state if still checking session or loading data
+  if (isLoading && !userData) {
+    return (
+      <div className="flex flex-col h-full">
+        <TopBar title="Dashboard" />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading your dashboard...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col h-full">
       <TopBar title="Dashboard" />
 
-      <div className="flex-1 space-y-4 p-8 pt-6 w-full max-w-[100%]">
+      <div className="flex-1 overflow-y-auto">
+        <div className="space-y-4 p-8 pt-6 w-full max-w-[100%]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -361,6 +390,7 @@ export default function Dashboard() {
             </Card>
           </motion.div>
         </motion.div>
+        </div>
       </div>
     </div>
   )

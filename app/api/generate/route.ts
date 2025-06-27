@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import type { GenerationRequest } from "@/lib/types"
 
 // OpenRouter API key
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "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"
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "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"
 
 // Rate limiting configuration
 const RATE_LIMIT_WINDOW = 60000 // 1 minute
@@ -91,15 +91,15 @@ export async function POST(request: Request) {
           console.error(`Error generating content for ${platform}:`, error)
           errors.push({ platform, error: error instanceof Error ? error.message : "Unknown error" })
           
-          // Instead of adding failed content, we'll add a placeholder that can be filtered out
+          // Add a fallback content instead of empty content
           results.push({
             platform,
-            content: "", // Empty content that will be filtered out
+            content: `Content generation failed for ${platform}. Please try regenerating this item.`,
             hashtags: [],
             viralScore: null,
             seoScore: null,
             outputIndex: j + 1,
-            failed: true
+            isError: true
           })
         }
             })()
@@ -165,7 +165,7 @@ Reply ONLY in this exact JSON format: { "viralScore": 87, "seoScore": 74 }`;
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "deepseek/deepseek-r1-0528:free",
+        model: "meta-llama/llama-3.1-8b-instruct:free",
         messages: [
           {
             role: "system",
@@ -197,16 +197,21 @@ If you include labels or formatting markers, the content will be rejected. Retur
     })
 
     if (!response.ok) {
-      throw new Error(`API request failed with status ${response.status}`)
+      const errorText = await response.text();
+      console.error('OpenRouter API error response:', errorText);
+      throw new Error(`API request failed with status ${response.status}: ${errorText}`)
     }
 
     const data = await response.json()
+    console.log('OpenRouter API response:', data); // Debug log
     
     if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
+      console.error('Invalid API response structure:', data);
       throw new Error("Invalid response from AI provider")
     }
     
     let generatedText = data.choices[0].message.content.trim()
+    console.log('Raw generated text:', generatedText); // Debug log
     
     // Comprehensive cleaning to ensure clean output
     generatedText = generatedText
@@ -239,8 +244,11 @@ If you include labels or formatting markers, the content will be rejected. Retur
       .replace(/\s{2,}/g, ' ') // Replace multiple spaces with single space
       .trim()
     
+    console.log('Cleaned generated text:', generatedText); // Debug log
+    
     // Validate that we have meaningful content
     if (!generatedText || generatedText.length < 10) {
+      console.error('Content too short after cleaning:', generatedText);
       throw new Error("Generated content is too short or empty")
     }
 
@@ -267,10 +275,10 @@ function createPromptForPlatform(blogContent: string, platform: string, tone: st
   const basePrompt = `Transform the following content into ${tone} ${platform} content. Use the ${language || 'english'} language.
 
 CRITICAL REQUIREMENTS:
-- Return ONLY the content itself, no labels, headers, or descriptions
+- Return ONLY the content itself, no labels, headers, no placeholders or descriptions
 - No "Output 1", "Tweet:", "Post:", or similar markers
 - No "Here's a..." or "This content..." descriptions
-- Just provide the actual content that would be posted
+- Just provide the actual content that would be posted, so that I can just directly copy and paste it
 
 Content to transform:
 ${blogContent}

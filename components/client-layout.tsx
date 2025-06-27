@@ -23,11 +23,9 @@ export function ClientLayout({ children }: ClientLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen w-full">
-      <div>
-        <AppSidebar />
-      </div>
-      <main className="flex-1 flex flex-col min-h-screen w-full">
+    <div className="flex h-screen w-full overflow-hidden">
+      <AppSidebar />
+      <main className="flex-1 flex flex-col overflow-hidden">
         {children}
       </main>
     </div>

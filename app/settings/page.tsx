@@ -329,10 +329,11 @@ function SettingsContent() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen w-full">
+    <div className="flex flex-col h-full w-full">
       <TopBar title="Settings" />
 
-      <div className="flex-1 w-full">
+      <div className="flex-1 overflow-y-auto">
+        <div className="w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -727,6 +728,7 @@ function SettingsContent() {
             </TabsContent>
           </Tabs>
         </motion.div>
+        </div>
       </div>
     </div>
   )
@@ -734,7 +736,7 @@ function SettingsContent() {
 
 export default function Settings() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+    <Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}>
       <SettingsContent />
     </Suspense>
   )

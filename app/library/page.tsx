@@ -445,10 +445,11 @@ export default function ContentLibrary() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col h-full">
       <TopBar title="Content Library" />
 
-      <div className="flex-1 px-4 sm:px-6 md:px-8 py-6">
+      <div className="flex-1 overflow-y-auto">
+        <div className="px-4 sm:px-6 md:px-8 py-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -715,6 +716,7 @@ export default function ContentLibrary() {
             )}
           </div>
         </motion.div>
+        </div>
       </div>
 
       {/* Content Details Dialog */}

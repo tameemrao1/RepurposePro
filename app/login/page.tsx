@@ -10,7 +10,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useToast } from "@/components/ui/use-toast"
 import { useLoading } from "@/components/loading-provider"
 import { Toaster } from "@/components/ui/toaster"
@@ -30,6 +30,54 @@ function LoginContent() {
   const searchParams = useSearchParams()
   const supabase = createClientComponentClient()
   const { toast } = useToast()
+
+  // Check for authentication errors from URL params
+  useEffect(() => {
+    const errorParam = searchParams.get('error')
+    if (errorParam) {
+      let errorMessage = 'An authentication error occurred'
+      
+      switch(errorParam) {
+        case 'auth_error':
+          errorMessage = 'Authentication was cancelled or failed'
+          break
+        case 'auth_exchange_failed':
+          errorMessage = 'Failed to complete authentication. Please try again.'
+          break
+        case 'callback_error':
+          errorMessage = 'There was an error processing your login. Please try again.'
+          break
+        case 'no_code':
+          errorMessage = 'Authentication was incomplete. Please try again.'
+          break
+      }
+      
+      setError(errorMessage)
+      setGlobalLoading(false)
+      
+      // Clear the error from URL
+      const newUrl = new URL(window.location.href)
+      newUrl.searchParams.delete('error')
+      window.history.replaceState({}, '', newUrl.toString())
+    }
+  }, [searchParams, setGlobalLoading])
+
+  // Check if user is already authenticated
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+          const redirectTo = searchParams.get('redirectedFrom') || '/dashboard'
+          router.push(redirectTo)
+        }
+      } catch (error) {
+        console.error('Session check error:', error)
+      }
+    }
+    
+    checkSession()
+  }, [supabase, router, searchParams])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
@@ -72,7 +120,11 @@ function LoginContent() {
       // Update loading message for redirection
       setLoadingMessage("Loading your dashboard...")
       
-      router.push(redirectTo)
+      // Add a small delay to ensure session is properly set
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      // Use replace instead of push to avoid back button issues
+      router.replace(redirectTo)
       
     } catch (error: any) {
       setError(error.message || "Failed to sign in")
@@ -88,10 +140,12 @@ function LoginContent() {
       setGlobalLoading(true)
       setLoadingMessage("Connecting to Google...")
       
+      const redirectTo = searchParams.get('redirectedFrom') || '/dashboard'
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback?redirectedFrom=${encodeURIComponent(redirectTo)}`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',

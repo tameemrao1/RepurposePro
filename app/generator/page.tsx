@@ -140,11 +140,10 @@ export default function Generator() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
     setIsGenerating(true)
     setError(null)
     setGenerationProgress(0)
-    setGeneratedContent([]) // Clear previous content
+    // Don't clear previous content immediately - wait until we have new content
 
     try {
       // Check session before proceeding
@@ -161,7 +160,6 @@ export default function Generator() {
         variant: "destructive",
       })
         setIsGenerating(false)
-        setIsLoading(false)
       return
     }
 
@@ -172,7 +170,6 @@ export default function Generator() {
         variant: "destructive",
       })
         setIsGenerating(false)
-        setIsLoading(false)
       return
     }
 
@@ -183,7 +180,6 @@ export default function Generator() {
         variant: "destructive",
       })
         setIsGenerating(false)
-        setIsLoading(false)
       return
     }
 
@@ -206,50 +202,42 @@ export default function Generator() {
         onProgress: updateProgress,
       })
 
-      // Process and clean up the results with comprehensive cleaning
+      console.log('Raw API results:', results); // Debug log
+
+      // Process and clean up the results with less aggressive cleaning
       const cleanResults = results
         .filter(result => result && result.content) // Remove null/undefined results
-        .map(result => {
+        .map((result, index) => {
           let cleanContent = result.content || '';
+          console.log(`Processing result ${index} for ${result.platform}:`, cleanContent); // Debug log
           
-          // Comprehensive content cleaning
+          // Less aggressive content cleaning - only remove obvious markers
           cleanContent = cleanContent
             .trim()
-            // Remove output markers and labels
-            .replace(/\[Tweet \d+\]/gi, '')
-            .replace(/Output \d+[:\-.]*/gi, '')
-            .replace(/Post \d+[:\-.]*/gi, '')
-            .replace(/Caption \d+[:\-.]*/gi, '')
-            .replace(/Content \d+[:\-.]*/gi, '')
-            .replace(/Option \d+[:\-.]*/gi, '')
+            // Remove only obvious output markers
+            .replace(/^\[Tweet \d+\][\s:]*/gi, '')
+            .replace(/^Output \d+[\s:.\-]*/gi, '')
+            .replace(/^Post \d+[\s:.\-]*/gi, '')
+            .replace(/^Caption \d+[\s:.\-]*/gi, '')
+            .replace(/^Content \d+[\s:.\-]*/gi, '')
             
-            // Remove platform-specific markers
-            .replace(/\[(Twitter|Instagram|LinkedIn|Facebook|YouTube|Threads|Email)\]/gi, '')
-            .replace(/(Twitter|Instagram|LinkedIn|Facebook|YouTube|Threads|Email) Post[:\-.]*/gi, '')
+            // Remove platform markers only at the beginning
+            .replace(/^\[(Twitter|Instagram|LinkedIn|Facebook|YouTube|Threads|Email)\][\s:]*/gi, '')
+            .replace(/^(Twitter|Instagram|LinkedIn|Facebook|YouTube|Threads|Email) Post[\s:.\-]*/gi, '')
             
-            // Remove suggested hashtags sections that might be generated
-            .replace(/Suggested Hashtags?:[\s\S]*$/gi, '')
-            .replace(/Hashtags?:[\s\S]*$/gi, '')
-            .replace(/Tags?:[\s\S]*$/gi, '')
-            
-            // Remove AI-generated meta text
-            .replace(/Here's? (a|an|the) .* for .*/gi, '')
-            .replace(/This (post|content) is .*/gi, '')
-            
-            // Clean up formatting
+            // Clean up excessive whitespace
             .replace(/\n{3,}/g, '\n\n') // Replace multiple newlines
             .replace(/\s{2,}/g, ' ') // Replace multiple spaces
-            .replace(/^\s*[\-\*\+]\s*/gm, '') // Remove bullet points at start of lines
             
             // Remove empty lines at start and end
             .trim();
           
-          // If content is too short or seems like an error message, mark it for potential regeneration
-          if (cleanContent.length < 10 || 
-              cleanContent.toLowerCase().includes('failed to generate') ||
-              cleanContent.toLowerCase().includes('error') ||
-              cleanContent.toLowerCase().includes('unable to')) {
-            cleanContent = `Unable to generate content for ${result.platform}. Please try regenerating this item.`;
+          console.log(`Cleaned content for ${result.platform}:`, cleanContent); // Debug log
+          
+          // Only mark as error if content is extremely short or obviously an error
+          if (cleanContent.length < 5) {
+            console.log(`Content too short for ${result.platform}, marking as error`);
+            cleanContent = `Content generation incomplete for ${result.platform}. Please try regenerating.`;
           }
           
           return {
@@ -262,6 +250,7 @@ export default function Generator() {
         })
         .filter(result => result.content.length > 0); // Remove results with empty content
 
+      console.log('Final cleaned results:', cleanResults); // Debug log
       setGeneratedContent(cleanResults)
 
       // Track the activity for each generated content
@@ -284,26 +273,34 @@ export default function Generator() {
       }
 
       if (successCount > 0) {
-      toast({
-        title: "Content Generated",
+        toast({
+          title: "Content Generated",
           description: `Successfully generated content for ${successCount} platform(s)`,
-      })
+        })
+      } else if (cleanResults.length > 0) {
+        // Content was generated but tracking failed - still show success
+        toast({
+          title: "Content Generated",
+          description: `Successfully generated content for ${cleanResults.length} platform(s)`,
+        })
       }
 
       // Ensure progress shows 100% when complete
       setGenerationProgress(100)
     } catch (error: any) {
-      console.error('Error:', error)
+      console.error('Generation error:', error)
+      console.error('Error stack:', error.stack)
       setError(error instanceof Error ? error.message : "Failed to generate content")
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to generate content",
+        title: "Generation Failed",
+        description: error instanceof Error ? error.message : "Failed to generate content. Please try again.",
         variant: "destructive",
       })
       setGenerationProgress(0)
+      // Make sure we clear any partial content on error
+      setGeneratedContent([])
     } finally {
       setIsGenerating(false)
-      setIsLoading(false)
     }
   }
 
@@ -372,17 +369,22 @@ export default function Generator() {
     }
   }
 
-  return (
-    <div className="flex flex-col min-h-screen">
-      <TopBar title="Content Generator" />
 
-      <div className="flex-1 px-4 sm:px-6 md:px-8 py-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-6xl mx-auto"
-        >
+
+  return (
+    <div className="relative h-screen w-full">
+      <div className="absolute top-0 left-0 right-0 z-10">
+        <TopBar title="Content Generator" />
+      </div>
+
+      <div className="absolute top-16 left-0 right-0 bottom-0 overflow-y-auto">
+        <div className="px-4 sm:px-6 md:px-8 py-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-6xl mx-auto"
+          >
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
             <motion.div
               className="lg:col-span-5"
@@ -657,6 +659,7 @@ export default function Generator() {
             </motion.div>
           </div>
         </motion.div>
+        </div>
       </div>
     </div>
   )
