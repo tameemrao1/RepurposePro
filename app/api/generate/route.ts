@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import type { GenerationRequest } from "@/lib/types"
 
 // OpenRouter API key
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "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"
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "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"
 
 // Rate limiting configuration
 const RATE_LIMIT_WINDOW = 60000 // 1 minute

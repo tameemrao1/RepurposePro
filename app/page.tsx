@@ -14,7 +14,7 @@ import HeroSection from "@/components/hero-section";
 
 export default function Home() {
   return (
-    <div className="relative h-full absolute bg-black text-white">
+    <div className="relative w-full h-full absolute bg-black text-white">
       {/* Navigation */}
       <nav className="sticky top-0 z-40 w-full backdrop-blur-lg bg-black/30 border-b border-white/10">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
