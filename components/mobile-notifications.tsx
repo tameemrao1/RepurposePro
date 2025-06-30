@@ -24,25 +24,12 @@ export function MobileNotifications() {
 
   // Function to show toast notification
   const showToastNotification = (notification: Notification) => {
-    const getIcon = (type: string) => {
-      switch (type) {
-        case "success":
-          return "✅"
-        case "error":
-          return "❌"
-        case "warning":
-          return "⚠️"
-        default:
-          return "ℹ️"
-      }
-    }
-
     const toastVariant = notification.type === "error" ? "destructive" : 
                        notification.type === "success" ? "success" :
                        notification.type === "warning" ? "warning" : "info"
 
     toast({
-      title: `${getIcon(notification.type)} ${notification.title}`,
+      title: notification.title,
       description: notification.message,
       variant: toastVariant as any,
       duration: 6000, // 6 seconds for better mobile visibility

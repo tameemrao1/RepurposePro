@@ -142,7 +142,7 @@
   }
 }
 
-/* Toast mobile optimizations */
+/* Toast modern optimizations */
 @media (max-width: 640px) {
   [data-radix-toast-viewport] {
     top: 1rem !important;
@@ -152,24 +152,28 @@
     width: auto !important;
     max-width: none !important;
     z-index: 9999 !important;
+    gap: 0.75rem !important;
   }
   
   [data-radix-toast-viewport] [data-radix-toast] {
     width: 100% !important;
     max-width: none !important;
     margin: 0 !important;
-    padding: 0.75rem !important;
-    font-size: 0.875rem !important;
-    line-height: 1.25rem !important;
+    border-radius: 0.75rem !important;
+    backdrop-filter: blur(16px) !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  }
+}
+
+/* Desktop toast enhancements */
+@media (min-width: 641px) {
+  [data-radix-toast-viewport] {
+    gap: 0.75rem !important;
   }
   
-  [data-radix-toast-viewport] [data-radix-toast] [data-radix-toast-title] {
-    font-size: 0.875rem !important;
-    font-weight: 600 !important;
-  }
-  
-  [data-radix-toast-viewport] [data-radix-toast] [data-radix-toast-description] {
-    font-size: 0.8125rem !important;
-    opacity: 0.9 !important;
+  [data-radix-toast-viewport] [data-radix-toast] {
+    min-width: 360px !important;
+    backdrop-filter: blur(20px) !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
   }
 }

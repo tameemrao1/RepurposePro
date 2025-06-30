@@ -57,7 +57,7 @@ export default function HeroSection() {
             <div className="flex justify-center items-center w-full">
               <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden shadow-[0_0_25px_rgba(124,59,237,0.2)] inline-block">
                 <Image
-                  src="/capture.png"
+                  src="/dashboard.png"
                   alt="Platform Interface"
                   width={800}
                   height={500}

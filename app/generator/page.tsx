@@ -15,7 +15,7 @@ import { useSimpleNotifications } from "@/hooks/use-simple-notifications"
 import GeneratedContent from "@/components/generated-content"
 import PlatformSelector from "@/components/platform-selector"
 import ToneSelector from "@/components/tone-selector"
-import { ToastDebug } from "@/components/toast-debug"
+
 import { platforms, tones } from "@/lib/data"
 import { TopBar } from "@/components/top-bar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -628,7 +628,6 @@ export default function Generator() {
         </motion.div>
         </div>
       </div>
-      <ToastDebug />
     </div>
   )
 }
