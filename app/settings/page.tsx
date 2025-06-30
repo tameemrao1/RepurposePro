@@ -17,6 +17,7 @@ import { Clipboard, ClipboardCheck, RefreshCw, Loader2 } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useTheme } from "next-themes"
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { profileStorage, preferencesStorage, notificationsStorage, apiKeyStorage } from "@/lib/settings-storage"
 
 interface NotificationSettings {
   emailNotifications: boolean
@@ -63,40 +64,75 @@ function SettingsContent() {
           return
         }
 
-        // Fetch user profile data
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
+        // Try to fetch from database first, fallback to localStorage
+        try {
+          // Fetch user profile data
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single()
 
-        if (profileError) {
-          console.error('Error fetching profile:', profileError)
-          return
-        }
+          if (!profileError && profile) {
+            setFormData({
+              firstName: profile.first_name || '',
+              lastName: profile.last_name || '',
+              email: profile.email || session.user.email || '',
+            })
+          } else {
+            // Fallback to localStorage
+            const localProfile = profileStorage.get()
+            setFormData({
+              firstName: localProfile.firstName,
+              lastName: localProfile.lastName,
+              email: session.user.email || localProfile.email,
+            })
+          }
 
-        // Set form data with profile information
-        setFormData({
-          firstName: profile.first_name || '',
-          lastName: profile.last_name || '',
-          email: profile.email || session.user.email || '',
-        })
+          // Fetch user preferences
+          const { data: preferences, error: preferencesError } = await supabase
+            .from('user_preferences')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .single()
 
-        // Fetch user preferences
-        const { data: preferences, error: preferencesError } = await supabase
-          .from('user_preferences')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .single()
+          if (!preferencesError && preferences) {
+            setDefaultTone(preferences.default_tone || 'professional')
+            setDefaultOutputCount(preferences.default_output_count?.toString() || '2')
+            setNotificationSettings({
+              emailNotifications: preferences.email_notifications || false,
+              contentGenerationAlerts: preferences.content_generation_alerts || false,
+              productUpdates: preferences.product_updates || false
+            })
+          } else {
+            // Fallback to localStorage
+            const localPrefs = preferencesStorage.get()
+            const localNotifs = notificationsStorage.get()
+            setDefaultTone(localPrefs.defaultTone)
+            setDefaultOutputCount(localPrefs.defaultOutputCount)
+            setNotificationSettings(localNotifs)
+          }
 
-        if (!preferencesError && preferences) {
-          setDefaultTone(preferences.default_tone || 'professional')
-          setDefaultOutputCount(preferences.default_output_count?.toString() || '2')
-          setNotificationSettings({
-            emailNotifications: preferences.email_notifications || false,
-            contentGenerationAlerts: preferences.content_generation_alerts || false,
-            productUpdates: preferences.product_updates || false
+          // Set API key from localStorage
+          setApiKey(apiKeyStorage.get())
+
+        } catch (dbError) {
+          console.log('Database not available, using localStorage fallback')
+          // Use localStorage as complete fallback
+          const localProfile = profileStorage.get()
+          const localPrefs = preferencesStorage.get()
+          const localNotifs = notificationsStorage.get()
+          
+          setFormData({
+            firstName: localProfile.firstName,
+            lastName: localProfile.lastName,
+            email: session.user.email || localProfile.email,
           })
+          
+          setDefaultTone(localPrefs.defaultTone)
+          setDefaultOutputCount(localPrefs.defaultOutputCount)
+          setNotificationSettings(localNotifs)
+          setApiKey(apiKeyStorage.get())
         }
 
       } catch (error) {
@@ -136,27 +172,43 @@ function SettingsContent() {
         return
       }
 
-      // Update profile in database
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({
-          first_name: formData.firstName,
-          last_name: formData.lastName
-        })
-        .eq('id', session.user.id)
+      // Try to update in database first, fallback to localStorage
+      try {
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            first_name: formData.firstName,
+            last_name: formData.lastName
+          })
+          .eq('id', session.user.id)
 
-      if (updateError) throw updateError
+        if (updateError) throw updateError
+      } catch (dbError) {
+        console.log('Database not available, saving to localStorage')
+      }
+
+      // Always save to localStorage as backup
+      profileStorage.set({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email
+      })
 
       toast({
         title: "Profile updated",
         description: "Your profile information has been updated successfully.",
       })
 
-      addNotification({
-        title: "Profile Updated",
-        message: "Your profile information has been updated successfully.",
-        type: "success",
-      })
+      // Try to add notification, don't fail if it doesn't work
+      try {
+        await addNotification({
+          title: "Profile Updated",
+          message: "Your profile information has been updated successfully.",
+          type: "success",
+        })
+      } catch (notifError) {
+        console.log('Failed to save notification, continuing...')
+      }
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -190,17 +242,28 @@ function SettingsContent() {
         return
       }
 
-      // Update preferences in database
-      const { error: updateError } = await supabase
-        .from('user_preferences')
-        .upsert({
-          user_id: session.user.id,
-          default_tone: defaultTone,
-          default_output_count: parseInt(defaultOutputCount),
-          updated_at: new Date().toISOString(),
-        })
+      // Try to update in database first, fallback to localStorage
+      try {
+        const { error: updateError } = await supabase
+          .from('user_preferences')
+          .upsert({
+            user_id: session.user.id,
+            default_tone: defaultTone,
+            default_output_count: parseInt(defaultOutputCount),
+            updated_at: new Date().toISOString(),
+          })
 
-      if (updateError) throw updateError
+        if (updateError) throw updateError
+      } catch (dbError) {
+        console.log('Database not available, saving to localStorage')
+      }
+
+      // Always save to localStorage as backup
+      preferencesStorage.set({
+        defaultTone,
+        defaultOutputCount,
+        darkMode
+      })
 
       toast({
         title: "Preferences saved",
@@ -229,18 +292,25 @@ function SettingsContent() {
         return
       }
 
-      // Update notification settings in database
-      const { error: updateError } = await supabase
-        .from('user_preferences')
-        .upsert({
-          user_id: session.user.id,
-          email_notifications: notificationSettings.emailNotifications,
-          content_generation_alerts: notificationSettings.contentGenerationAlerts,
-          product_updates: notificationSettings.productUpdates,
-          updated_at: new Date().toISOString(),
-        })
+      // Try to update in database first, fallback to localStorage
+      try {
+        const { error: updateError } = await supabase
+          .from('user_preferences')
+          .upsert({
+            user_id: session.user.id,
+            email_notifications: notificationSettings.emailNotifications,
+            content_generation_alerts: notificationSettings.contentGenerationAlerts,
+            product_updates: notificationSettings.productUpdates,
+            updated_at: new Date().toISOString(),
+          })
 
-      if (updateError) throw updateError
+        if (updateError) throw updateError
+      } catch (dbError) {
+        console.log('Database not available, saving to localStorage')
+      }
+
+      // Always save to localStorage as backup
+      notificationsStorage.set(notificationSettings)
 
       toast({
         title: "Notification settings saved",
@@ -258,8 +328,8 @@ function SettingsContent() {
   }
 
   const handleCopyApiKey = () => {
-    // In a real app, you would reveal and copy the actual API key
-    navigator.clipboard.writeText("sk-actual-api-key-would-be-here")
+    const actualKey = apiKeyStorage.get()
+    navigator.clipboard.writeText(actualKey)
     setIsCopied(true)
 
     toast({
@@ -284,32 +354,39 @@ function SettingsContent() {
         return
       }
 
-      // Generate new API key (implement your API key generation logic)
-      const newApiKey = 'sk-' + Math.random().toString(36).substring(2)
+      // Generate new API key
+      const newApiKey = apiKeyStorage.generate()
 
-      // Update API key in database
-      const { error: updateError } = await supabase
-        .from('user_preferences')
-        .upsert({
-          user_id: session.user.id,
-          api_key: newApiKey,
-          updated_at: new Date().toISOString(),
-        })
+      // Try to update in database, but don't fail if it doesn't work
+      try {
+        await supabase
+          .from('user_preferences')
+          .upsert({
+            user_id: session.user.id,
+            api_key: newApiKey,
+            updated_at: new Date().toISOString(),
+          })
+      } catch (dbError) {
+        console.log('Database not available, key saved to localStorage')
+      }
 
-      if (updateError) throw updateError
-
-      setApiKey("••••••••••••••••••••••••••••••")
+      setApiKey("sk-••••••••••••••••••••••••••••••")
 
       toast({
         title: "API key regenerated",
         description: "A new API key has been generated.",
       })
 
-      addNotification({
-        title: "API Key Regenerated",
-        message: "Your API key has been regenerated. Make sure to update it in your applications.",
-        type: "warning",
-      })
+      // Try to add notification, don't fail if it doesn't work
+      try {
+        await addNotification({
+          title: "API Key Regenerated",
+          message: "Your API key has been regenerated. Make sure to update it in your applications.",
+          type: "warning",
+        })
+      } catch (notifError) {
+        console.log('Failed to save notification, continuing...')
+      }
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -406,11 +483,11 @@ function SettingsContent() {
                             name="email"
                             type="email"
                             value={formData.email}
-                            disabled
-                            className="bg-muted"
+                            onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                            className="bg-background"
                           />
                           <p className="text-sm text-muted-foreground">
-                            Email cannot be changed when using Google login.
+                            Your email address for account and notifications.
                           </p>
                         </div>
                       </div>
@@ -545,7 +622,7 @@ function SettingsContent() {
                   ) : (
                     <>
                       <div className="space-y-4">
-                        {/* <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between">
                           <div>
                             <h4 className="font-medium">Email Notifications</h4>
                             <p className="text-sm text-muted-foreground">Receive email updates about your activity</p>
@@ -556,7 +633,7 @@ function SettingsContent() {
                               setNotificationSettings(prev => ({ ...prev, emailNotifications: checked }))
                             }
                           />
-                        </div> */}
+                        </div>
                         <div className="flex items-center justify-between">
                           <div>
                             <h4 className="font-medium">Content Generation Alerts</h4>
@@ -571,7 +648,7 @@ function SettingsContent() {
                             }
                           />
                         </div>
-                        {/* <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between">
                           <div>
                             <h4 className="font-medium">Product Updates</h4>
                             <p className="text-sm text-muted-foreground">
@@ -584,7 +661,7 @@ function SettingsContent() {
                               setNotificationSettings(prev => ({ ...prev, productUpdates: checked }))
                             }
                           />
-                        </div> */}
+                        </div>
                       </div>
                       <div className="flex justify-end">
                         <Button onClick={handleSaveNotifications} disabled={isSaving}>

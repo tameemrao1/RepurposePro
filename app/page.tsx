@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 import MobileMenuWrapper from "@/components/mobile-menu-wrapper";
 import HeroSection from "@/components/hero-section";
+import { SmoothScrollLink } from "@/components/smooth-scroll-link";
 
 export default function Home() {
   return (
@@ -26,21 +27,21 @@ export default function Home() {
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
-          <a href="#features" className="text-sm text-white/70 hover:text-white transition-colors">
+          <SmoothScrollLink href="#features" className="text-sm text-white/70 hover:text-white transition-colors">
             Features
-          </a>
-          <a href="#how-it-works" className="text-sm text-white/70 hover:text-white transition-colors">
+          </SmoothScrollLink>
+          <SmoothScrollLink href="#how-it-works" className="text-sm text-white/70 hover:text-white transition-colors">
             How It Works
-          </a>
-          <a href="#testimonials" className="text-sm text-white/70 hover:text-white transition-colors">
+          </SmoothScrollLink>
+          <SmoothScrollLink href="#testimonials" className="text-sm text-white/70 hover:text-white transition-colors">
             Testimonials
-          </a>
-          <a href="#pricing" className="text-sm text-white/70 hover:text-white transition-colors">
+          </SmoothScrollLink>
+          <SmoothScrollLink href="#pricing" className="text-sm text-white/70 hover:text-white transition-colors">
             Pricing
-          </a>
-          <a href="#faq" className="text-sm text-white/70 hover:text-white transition-colors">
+          </SmoothScrollLink>
+          <SmoothScrollLink href="#faq" className="text-sm text-white/70 hover:text-white transition-colors">
             FAQ
-          </a>
+          </SmoothScrollLink>
         </div>
 
         <div className="flex items-center gap-4">

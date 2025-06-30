@@ -113,3 +113,63 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.5);
 }
+
+/* Mobile sidebar full height fix */
+@media (max-width: 768px) {
+  [data-sidebar="sidebar"][data-mobile="true"] {
+    height: 100vh !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+  }
+  
+  [data-sidebar="sidebar"][data-mobile="true"] > div {
+    height: 100vh !important;
+    min-height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  /* Ensure proper mobile viewport handling */
+  [data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="content"] {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  
+  [data-sidebar="sidebar"][data-mobile="true"] [data-sidebar="footer"] {
+    flex-shrink: 0;
+    margin-top: auto;
+  }
+}
+
+/* Toast mobile optimizations */
+@media (max-width: 640px) {
+  [data-radix-toast-viewport] {
+    top: 1rem !important;
+    left: 1rem !important;
+    right: 1rem !important;
+    bottom: auto !important;
+    width: auto !important;
+    max-width: none !important;
+    z-index: 9999 !important;
+  }
+  
+  [data-radix-toast-viewport] [data-radix-toast] {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0.75rem !important;
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+  }
+  
+  [data-radix-toast-viewport] [data-radix-toast] [data-radix-toast-title] {
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+  }
+  
+  [data-radix-toast-viewport] [data-radix-toast] [data-radix-toast-description] {
+    font-size: 0.8125rem !important;
+    opacity: 0.9 !important;
+  }
+}

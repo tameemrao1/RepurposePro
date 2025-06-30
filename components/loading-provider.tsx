@@ -99,15 +99,19 @@ function LoadingProviderContent({ children }: { children: React.ReactNode }) {
         
         // Don't show loading for hash links or landing page internal navigation
         if (link && link.href) {
-          const isHashLink = link.getAttribute('href')?.startsWith('#');
-          const isInternalLink = link.hash && link.pathname === window.location.pathname;
+          const href = link.getAttribute('href');
+          const isHashLink = href?.startsWith('#');
+          const isInternalHashLink = link.hash && link.pathname === window.location.pathname;
+          const isCurrentPageHashLink = href?.startsWith('#') && window.location.pathname === '/';
           
-          if (isHashLink || isInternalLink) {
+          // Skip loading for any hash links or internal page navigation
+          if (isHashLink || isInternalHashLink || isCurrentPageHashLink) {
             return;
           }
 
-          if (!link.target && link.origin === window.location.origin) {
-          handleStart(link.pathname);
+          // Only show loading for actual page navigation
+          if (!link.target && link.origin === window.location.origin && !link.hash) {
+            handleStart(link.pathname);
           }
         }
       };

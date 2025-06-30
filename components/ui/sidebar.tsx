@@ -198,17 +198,20 @@ const Sidebar = React.forwardRef<
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
-        className="w-full max-w-[85vw] bg-[#09090B] p-0 text-sidebar-foreground [&>button]:hidden"
+        className="w-full max-w-[85vw] bg-[#09090B] p-0 text-sidebar-foreground [&>button]:hidden h-full"
             style={
               {
                 "--sidebar-width": "100%",
+                height: "100vh",
+                minHeight: "100vh",
+                maxHeight: "100vh",
               } as React.CSSProperties
             }
             side={side}
             hideCloseButton
           >
-            <div className="flex h-full w-full flex-col overflow-y-auto">
-              <div className="flex-1 overflow-y-auto overscroll-contain pb-safe-area-inset-bottom">
+            <div className="flex h-full w-full flex-col min-h-screen">
+              <div className="flex-1 flex flex-col h-full min-h-0">
                 {children}
               </div>
             </div>

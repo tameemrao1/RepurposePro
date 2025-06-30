@@ -1,6 +1,7 @@
 "use client"
 
 import { usePathname } from "next/navigation"
+import { useEffect } from "react"
 import { AppSidebar } from "@/components/app-sidebar"
 
 interface ClientLayoutProps {
@@ -14,9 +15,25 @@ export function ClientLayout({ children }: ClientLayoutProps) {
   const noSidebarPages = ['/', '/login', '/signup', '/register']
   const showSidebar = !noSidebarPages.includes(pathname)
 
+  // Handle body overflow based on page type
+  useEffect(() => {
+    if (showSidebar) {
+      // For sidebar pages, prevent body scrolling
+      document.body.style.overflow = 'hidden'
+    } else {
+      // For non-sidebar pages, allow body scrolling
+      document.body.style.overflow = 'auto'
+    }
+
+    // Cleanup function to reset on unmount
+    return () => {
+      document.body.style.overflow = 'auto'
+    }
+  }, [showSidebar])
+
   if (!showSidebar) {
     return (
-      <div className="relative w-full h-full overflow-x-hidden">
+      <div className="relative w-full min-h-screen overflow-x-hidden">
         {children}
       </div>
     )

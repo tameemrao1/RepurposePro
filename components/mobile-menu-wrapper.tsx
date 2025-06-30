@@ -1,12 +1,32 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { MobileMenu } from "@/components/mobile-menu"
 
 export default function MobileMenuWrapper() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Check if device is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768) // md breakpoint
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  // Force close menu when switching to desktop
+  useEffect(() => {
+    if (!isMobile && isOpen) {
+      setIsOpen(false)
+    }
+  }, [isMobile, isOpen])
 
   return (
     <>
@@ -20,7 +40,10 @@ export default function MobileMenuWrapper() {
         <span className="sr-only">Open menu</span>
       </Button>
 
-      <MobileMenu isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      {/* Only render mobile menu on mobile devices */}
+      {isMobile && (
+        <MobileMenu isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      )}
     </>
   )
 }

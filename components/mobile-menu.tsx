@@ -5,6 +5,7 @@ import { X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
+import { SmoothScrollLink } from "@/components/smooth-scroll-link"
 
 interface MobileMenuProps {
   isOpen: boolean
@@ -55,17 +56,21 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       {/* Menu Panel */}
       <div
         className={cn(
-          "fixed inset-0 w-full sm:w-[400px] sm:right-0 sm:left-auto bg-[#0f0f0f] z-[100] shadow-2xl",
+          "fixed inset-y-0 right-0 w-full max-w-sm bg-[#0f0f0f] z-[100] shadow-2xl",
           "transform transition-all duration-300 ease-in-out",
+          "md:hidden", // Only show on mobile
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
         style={{
+          width: '100vw', // Full width on mobile
+          maxWidth: '100vw', // Ensure no horizontal overflow
+          minHeight: '100vh', // Full height on mobile
           height: '100dvh' // Using dynamic viewport height for better mobile support
         }}
       >
         <div className="h-full flex flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-white/10">
+          <div className="flex items-center justify-between p-2 border-b border-white/10">
             {/* Logo with animation */}
             <Link href="/" className="flex items-center gap-2 opacity-0 animate-fade-in" onClick={onClose}>
               <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#7c3bed] to-[#a56eff] 
@@ -108,16 +113,16 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                       animation: `fade-in-up 0.5s ease-out forwards ${index * 0.1}s`,
                     }}
                   >
-                <a
+                <SmoothScrollLink
                   href={item.href}
-                      className="group flex items-center text-2xl font-light text-white/90 hover:text-white transition-all duration-200"
+                  className="group flex items-center text-2xl font-light text-white/90 hover:text-white transition-all duration-200"
                   onClick={onClose}
                 >
-                      <span className="relative">
-                  {item.name}
-                        <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-white transition-all duration-300 group-hover:w-full" />
-                      </span>
-                </a>
+                  <span className="relative">
+                    {item.name}
+                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-white transition-all duration-300 group-hover:w-full" />
+                  </span>
+                </SmoothScrollLink>
               </li>
             ))}
           </ul>

@@ -11,9 +11,11 @@ import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { Sparkles, LinkIcon, Loader2, AlertCircle, Upload, FileText, RefreshCw } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
+import { useSimpleNotifications } from "@/hooks/use-simple-notifications"
 import GeneratedContent from "@/components/generated-content"
 import PlatformSelector from "@/components/platform-selector"
 import ToneSelector from "@/components/tone-selector"
+import { ToastDebug } from "@/components/toast-debug"
 import { platforms, tones } from "@/lib/data"
 import { TopBar } from "@/components/top-bar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -48,6 +50,8 @@ export default function Generator() {
   const [isReadingFile, setIsReadingFile] = useState(false)
   const [generationProgress, setGenerationProgress] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  
+  const { showToast } = useSimpleNotifications()
   const [selectedLanguage, setSelectedLanguage] = useState("english")
   const [isLoading, setIsLoading] = useState(false)
   const supabase = createClientComponentClient()
@@ -65,11 +69,7 @@ export default function Generator() {
 
   const handleFetchUrl = async () => {
     if (!blogUrl) {
-      toast({
-        title: "Missing URL",
-        description: "Please enter a valid blog URL to fetch content.",
-        variant: "destructive",
-      })
+      showToast("Missing URL", "Please enter a valid blog URL to fetch content.", "warning")
       return
     }
 
@@ -77,11 +77,7 @@ export default function Generator() {
     try {
       new URL(blogUrl)
     } catch (error) {
-      toast({
-        title: "Invalid URL",
-        description: "Please enter a valid URL including http:// or https://",
-        variant: "destructive",
-      })
+      showToast("Invalid URL", "Please enter a valid URL including http:// or https://", "warning")
       return
     }
 
@@ -89,27 +85,17 @@ export default function Generator() {
     setError(null)
 
     try {
-      toast({
-        title: "Fetching content",
-        description: "Extracting content from the provided URL...",
-      })
+      showToast("Fetching content", "Extracting content from the provided URL...", "info")
 
       // Call the API to extract content from the URL
       const extractedContent = await extractContentFromUrl(blogUrl)
       setBlogContent(extractedContent)
 
-      toast({
-        title: "Content extracted",
-        description: "Successfully extracted content from the URL.",
-      })
+      showToast("Content extracted", "Successfully extracted content from the URL.", "success")
     } catch (error) {
       console.error("Error fetching URL:", error)
       setError("Failed to extract content from the URL. Please try again or paste the content manually.")
-      toast({
-        title: "Extraction failed",
-        description: "Failed to extract content from the URL. Please try again or paste the content manually.",
-        variant: "destructive",
-      })
+      showToast("Extraction failed", "Failed to extract content from the URL. Please try again or paste the content manually.", "error")
     } finally {
       setIsFetchingUrl(false)
     }
@@ -154,32 +140,20 @@ export default function Generator() {
       }
 
     if (!blogContent.trim()) {
-      toast({
-        title: "Missing content",
-        description: "Please paste your blog content to continue.",
-        variant: "destructive",
-      })
-        setIsGenerating(false)
+      showToast("Missing content", "Please paste your blog content to continue.", "warning")
+      setIsGenerating(false)
       return
     }
 
     if (selectedPlatforms.length === 0) {
-      toast({
-        title: "Select platforms",
-        description: "Please select at least one platform.",
-        variant: "destructive",
-      })
-        setIsGenerating(false)
+      showToast("Select platforms", "Please select at least one platform.", "warning")
+      setIsGenerating(false)
       return
     }
 
     if (!selectedTone) {
-      toast({
-        title: "Select tone",
-        description: "Please select a tone for your content.",
-        variant: "destructive",
-      })
-        setIsGenerating(false)
+      showToast("Select tone", "Please select a tone for your content.", "warning")
+      setIsGenerating(false)
       return
     }
 
@@ -273,16 +247,20 @@ export default function Generator() {
       }
 
       if (successCount > 0) {
-        toast({
-          title: "Content Generated",
-          description: `Successfully generated content for ${successCount} platform(s)`,
-        })
+        const platformNames = [...new Set(cleanResults.map(r => r.platform))].join(", ")
+        const message = cleanResults.length === 1 
+          ? `Content generated for ${platformNames}` 
+          : `${cleanResults.length} pieces of content generated for ${platformNames}`
+        
+        showToast("Content Ready!", message, "success", 5000)
       } else if (cleanResults.length > 0) {
         // Content was generated but tracking failed - still show success
-        toast({
-          title: "Content Generated",
-          description: `Successfully generated content for ${cleanResults.length} platform(s)`,
-        })
+        const platformNames = [...new Set(cleanResults.map(r => r.platform))].join(", ")
+        const message = cleanResults.length === 1 
+          ? `Content generated for ${platformNames}` 
+          : `${cleanResults.length} pieces of content generated for ${platformNames}`
+        
+        showToast("Content Ready!", message, "success", 5000)
       }
 
       // Ensure progress shows 100% when complete
@@ -291,11 +269,11 @@ export default function Generator() {
       console.error('Generation error:', error)
       console.error('Error stack:', error.stack)
       setError(error instanceof Error ? error.message : "Failed to generate content")
-      toast({
-        title: "Generation Failed",
-        description: error instanceof Error ? error.message : "Failed to generate content. Please try again.",
-        variant: "destructive",
-      })
+      showToast(
+        "Generation Failed",
+        error instanceof Error ? error.message : "Failed to generate content. Please try again.",
+        "error"
+      )
       setGenerationProgress(0)
       // Make sure we clear any partial content on error
       setGeneratedContent([])
@@ -309,11 +287,7 @@ export default function Generator() {
     const originalItem = generatedContent.find((item, i) => item.platform === platform && i === index)
 
     if (!originalItem) {
-      toast({
-        title: "Regeneration failed",
-        description: "Could not find the original content to regenerate.",
-        variant: "destructive",
-      })
+      showToast("Regeneration failed", "Could not find the original content to regenerate.", "error")
       return
     }
 
@@ -340,17 +314,10 @@ export default function Generator() {
         })
       }
 
-      toast({
-        title: "Content regenerated",
-        description: "Successfully regenerated content.",
-      })
+      showToast("Content regenerated", "Successfully regenerated content.", "success")
     } catch (error) {
       console.error("Error regenerating content:", error)
-      toast({
-        title: "Regeneration failed",
-        description: error instanceof Error ? error.message : "Failed to regenerate content",
-        variant: "destructive",
-      })
+      showToast("Regeneration failed", error instanceof Error ? error.message : "Failed to regenerate content", "error")
     }
   }
 
@@ -661,6 +628,7 @@ export default function Generator() {
         </motion.div>
         </div>
       </div>
+      <ToastDebug />
     </div>
   )
 }

@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { LoadingProvider } from "@/components/loading-provider"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { ClientLayout } from "@/components/client-layout"
+import { MobileNotifications } from "@/components/mobile-notifications"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
@@ -24,13 +25,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="h-full">
-      <body className={`${inter.variable} font-sans antialiased h-full w-full overflow-hidden`}>
+      <body className={`${inter.variable} font-sans antialiased h-full w-full`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <LoadingProvider>
             <SidebarProvider defaultOpen={true}>
               <ClientLayout>
                 {children}
               </ClientLayout>
+              <MobileNotifications />
               <Toaster />
             </SidebarProvider>
           </LoadingProvider>
