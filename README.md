@@ -1,5 +1,5 @@
 # AI-Powered Content Repurposing Platform
-![Alt Text](/dashboard.png)
+![App Screenshot](./public/dashboard.png)
 
 ## 🧠 The Problem
 Creators waste hours repurposing content manually. This tool needed to automate that while preserving tone and brand.
