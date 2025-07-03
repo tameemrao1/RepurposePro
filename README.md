@@ -1,30 +1,38 @@
-# Build core blog system
+# AI-Powered Content Repurposing Platform
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+## 🧠 The Problem
+Creators waste hours repurposing content manually. This tool needed to automate that while preserving tone and brand.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/tameems-projects-96a1ab5a/v0-build-core-blog-system)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/IsgTmlXannG)
+## 🚀 The Solution
+I developed a **Full-Stack AI-powered platform** that turns blog posts into short-form content for multiple social platforms—while keeping the brand voice intact.
 
-## Overview
+### ✅ Features Include:
+- AI-powered repurposing  
+- Content management  
+- Platform-specific formatting  
+- AI Content Score & advanced customization options  
+- Secured Authentication (Google Auth)  
+- Notifications, Dark/Light mode switch, and more  
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+All from a **central dashboard**, built with **Next.js, TypeScript, Three.js**, and **OpenRouter APIs**.
 
-## Deployment
+I focused on **speed, scalability, and simplicity** to deliver real value to solo creators and teams.
 
-Your project is live at:
+## 📚 What I Learned
+I learned how to integrate powerful AI features while keeping the UX intuitive. Balancing automation, scalability, and simplicity was key to creating real value for creators.
 
-**[https://vercel.com/tameems-projects-96a1ab5a/v0-build-core-blog-system](https://vercel.com/tameems-projects-96a1ab5a/v0-build-core-blog-system)**
+## 🔗 https://repurpose-pro.vercel.app/
 
-## Build your app
+---
 
-Continue building your app on:
-
-**[https://v0.dev/chat/projects/IsgTmlXannG](https://v0.dev/chat/projects/IsgTmlXannG)**
-
-## How It Works
-
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+## 🏷 Tags:
+#WebDevelopment  
+#FullStackDeveloper  
+#saas  
+#aisaas  
+#creativecoding  
+#buildinpublic  
+#Nextjs  
+#TypeScript  
+#TailwindCSS  
+#Supabase
