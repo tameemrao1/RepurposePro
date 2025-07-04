@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import type { GenerationRequest } from "@/lib/types"
 
 // OpenRouter API key
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "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"
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "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"
 
 // Rate limiting configuration
 const RATE_LIMIT_WINDOW = 60000 // 1 minute
@@ -165,7 +165,7 @@ Reply ONLY in this exact JSON format: { "viralScore": 87, "seoScore": 74 }`;
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "meta-llama/llama-3.1-8b-instruct:free",
+        model: "google/gemma-2-9b-it:free",
         messages: [
           {
             role: "system",
